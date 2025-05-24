@@ -1,5 +1,5 @@
 # Asymptotic_stat
 
-This is a presentation slide used at a reading group of Asymptotic Statistics.
+These are presentation slides and supplemental meterials used at a reading group of Asymptotic Statistics.
 
-The content is about 「semiparametric theory and missing data」 chapter 10-11.
+They cover 「semiparametric theory and missing data」 chapter 10-11.
