@@ -29,7 +29,6 @@
 \newcommand{\cov}{\mathrm{Cov}}
 \newcommand{\1}{\mathbbm{1}}
 
-% --- Title metadata ---
 \title{Tsiatis (2006) Chapters 10--11\\ \small{Asymptotic Statistics 2025 Summer Reading Group}}
 \author{Naoki Eguchi}
 \institute{Faculty of Medicine, Kyoto University}
@@ -37,9 +36,6 @@
 
 \begin{document}
 
-% ----------------------------------------------------------
-% Title + agenda
-% ----------------------------------------------------------
 \begin{frame}
   \titlepage
 \end{frame}
@@ -53,50 +49,101 @@
     \item Chapter 11: Locally efficient estimators (two representations; how to compute)
     \item Practical recipe: what to implement in 2h
   \end{itemize}
-  % Sources: overview of AIPWCC machinery and DR linear space J(!F^\perp) in Ch.10–11
-  % :contentReference[oaicite:10]{index=10}  :contentReference[oaicite:11]{index=11}
 \end{frame}
 
-% ----------------------------------------------------------
 \section{Recap}
-% ----------------------------------------------------------
 
-\begin{frame}{Coarsened data \& notation: 10-second recap}
+\begin{frame}{Coarsened data and Semiparametric statistics}
   \begin{itemize}
-    \item Full data $Z$; observed data $\{C,\,G_C(Z)\}$ under CAR.
-    \item Complete-case weights: $\pi(\infty,Z,\psi)=P(C=\infty\mid Z)$.
-    \item AIPWCC estimating function for full-data $m(Z,\beta)$:
+    \item Full data $Z$; observed data $\{C,\,G_C(Z)\}$ under CAR (coarsening at random).\\
+          $\Rightarrow\ \forall r,\ P(C=r\mid Z)=\pi\{r,\,G_r(Z)\}$ \ (coarsening depends only on observed data.)
+    \item When $C=\infty$, the data are completely observed (equal to full data).
+    \item In semiparametric statistics, we study the influence function, an element of $\Lambda^{\perp}$.
+    \begin{itemize}
+      \item Full-data tangent space: $\mathcal{H}^F$; full-data nuisance tangent space: $\Lambda_F \subset \mathcal{H}^F$.
+      \begin{itemize}
+        \item (Observed) tangent space: $\mathcal{H}$; nuisance tangent space:
+              $\Lambda=\Lambda_{\psi}\oplus \Lambda_{\eta}\ \ (\Lambda_{\psi}\perp \Lambda_{\eta})$.
+      \end{itemize}
+    \end{itemize}
+    \item \textbf{Theorem 8.3}: all observed-data influence functions can be written as
     \[
-      I(C=\infty)\frac{m(Z,\beta)}{\pi(\infty,Z,\psi)}\;+\;L_2\{C,G_C(Z),\beta,\psi\},
+      \varphi \{C,G_C(Z)\}
+      =
+      \Biggl[
+        \frac{\mathbf{1}(C=\infty)}{\pi(\infty,Z,\psi_0)}\,\varphi ^F(Z)
+        + L_2\{C,G_C(Z)\}
+      \Biggr]
+      \;-\; \Pi\!\bigl([\cdot]\mid \Lambda_\psi\bigr)
     \]
-    where $L_2\in\mathcal{A}$ (augmentation space) is chosen to reduce variance.
+    where $\varphi ^F(Z)$ : full-data IF, $L_2\{C,G_C(Z)\}\in \Lambda_2$ (augmentation space)
   \end{itemize}
-  \begin{tcolorbox}[title=Key idea, colback=gray!5!white]
-  Among all AIPWCC with fixed full-data $m$, choose $L_2=-\Pi\!\left[I(C=\infty)\,m/\pi \mid \mathcal{A}\right]$:
-  the projection onto the augmentation space gives the variance-optimal element in that class.
-  \end{tcolorbox}
-  % AIPWCC form and projection onto !2: (10.6)–(10.7); definition of DR linear space: Ch.10
-  % :contentReference[oaicite:12]{index=12}  :contentReference[oaicite:13]{index=13}
 \end{frame}
 
-\begin{frame}{Influence function geometry (for later)}
-  \begin{itemize}
-    \item Full-data Hilbert space $\mathcal{H}_F$; nuisance tangent space $\mathcal{F}$; orthogonal complement $\mathcal{F}^{\perp}$.
-    \item DR linear space: $\mathcal{J}(\mathcal{F}^{\perp})=\{\,\mathcal{J}(\phi_F): \phi_F\in\mathcal{F}^{\perp}\,\}$ with
-    \[
-      \mathcal{J}\{h_F(Z)\}=I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)}-\Pi\!\left[I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)}\middle|\mathcal{A}\right].
-    \]
-    \item Efficient observed-data estimators live in (or are induced by) this DR space.
-  \end{itemize}
-  % DR linear space & operator J(·): Ch.10 Sec.10.1–10.2
-  % :contentReference[oaicite:14]{index=14}
-\end{frame}
-
-% ----------------------------------------------------------
 \section{10. Improving Efficiency \& Double Robustness with Coarsened Data}
-% ----------------------------------------------------------
 
-\begin{frame}{Set-up: Two-level missingness (our focus)}
+\begin{frame}{The optimal (variance-minimizing) observed-data IF}
+    \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.1]
+  \begin{itemize}
+    \item For fixed full-data IF $\varphi_F(Z)\in(\mathrm{IF})_F$, the optimal choice is
+    \[
+      L_2\{C,G_C(Z)\}
+      \;=\;
+      -\,\Pi\!\left[
+        \frac{\mathbf{1}(C=\infty)\,\varphi_F(Z)}{\pi(\infty,Z,\psi_0)}
+        \ \middle|\ \Lambda_2
+      \right].
+    \]
+    \item Hence the optimal observed-data influence function is given by
+    \[
+      \frac{\mathbf{1}(C=\infty)\,\varphi_F(Z)}{\pi(\infty,Z,\psi_0)}
+      \;-\;
+      \Pi\!\left[
+        \frac{\mathbf{1}(C=\infty)\,\varphi_F(Z)}{\pi(\infty,Z,\psi_0)}
+        \ \middle|\ \Lambda_2
+      \right].
+    \]
+  \end{itemize}
+\end{tcolorbox}
+\begin{itemize}
+    \item \textit{Remark 1} : If we know $\psi_0$, we can choose optimal IF. \\
+    Also, we do not have to estimate $\psi$ because $\Lambda_{\psi}\subset \Lambda_2$ (already subtracted !)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Generalized by linear operators}
+    \begin{tcolorbox}[colframe=red,title=Definition 1]
+    \begin{itemize}
+      \item Define the linear operator $\mathcal{J}:\mathcal{H}^F\to\mathcal{H}$
+      \[
+        h_F \mapsto 
+        \mathcal{J}
+        (h_F) =
+        \frac{\mathbf{1}(C=\infty)}{\pi(\infty,Z,\psi_0)}\,h_F(Z)
+        - \Pi\!\left[
+          \frac{\mathbf{1}(C=\infty)}{\pi(\infty,Z,\psi_0)}\,h_F(Z)
+          \ \middle|\ \Lambda_2
+        \right].
+      \]
+    \end{itemize}
+  \end{tcolorbox}
+  \begin{itemize}
+    \item This operator turns full-data IF into efficient observed-data IF, so we can create efficient observed-data IF space.
+  \end{itemize}
+  \begin{tcolorbox}[colframe=red,title=Definition 2]
+    \begin{itemize}
+      \item The class of \emph{double-robust} observed-data influence functions is defined by
+      \[
+        (\mathrm{IF})_{\mathrm{DR}}
+        =
+        \big\{\, \mathcal{J}(\varphi_F): \varphi_F(Z)\in(\mathrm{IF})_F \,\big\}.
+      \]
+    \end{itemize}
+  \end{tcolorbox}
+\end{frame}
+
+
+\begin{frame}{Set-up: Two-level missingness}
   \begin{itemize}
     \item Partition $Z=(Z_1^\top,Z_2^\top)^\top$ with $Z_1$ always observed and $Z_2$ sometimes missing.
     \item Complete-case indicator $R\in\{0,1\}$ with MAR: $P(R=1\mid Z)=P(R=1\mid Z_1)=\pi(Z_1,\psi)$ (e.g., logistic).
