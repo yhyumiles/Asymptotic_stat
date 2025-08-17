@@ -1,4 +1,4 @@
-# Asymptotic_stat
+# Asymptotic_statistics 2025 summer reading group
 
 These are presentation slides and supplemental meterials used at a reading group of Asymptotic Statistics.
 
