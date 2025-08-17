@@ -111,7 +111,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Generalized by linear operators}
+\begin{frame}{Generalized by linear operator}
     \begin{tcolorbox}[colframe=red,title=Definition 1]
     \begin{itemize}
       \item Define the linear operator $\mathcal{J}:\mathcal{H}^F\to\mathcal{H}$
@@ -142,6 +142,9 @@
   \end{tcolorbox}
 \end{frame}
 
+\begin{frame}
+    
+\end{frame}
 
 \begin{frame}{Set-up: Two-level missingness}
   \begin{itemize}
@@ -228,31 +231,50 @@
   \begin{tcolorbox}[title=Pointer]
     Keep the operators $L$ and $M$ in mind; they will be our bridge to Chapter~11.
   \end{tcolorbox}
-  % Nonmonotone: caution about feasibility
-  % :contentReference[oaicite:22]{index=22}  :contentReference[oaicite:23]{index=23}
 \end{frame}
+
+\section{10.5 Improving Efficiency when Coarsening is Nonmonotone}
 
 \begin{frame}{Generalization idea: operators $L$ and $M$ (you’ll need this)}
-  \begin{itemize}
-    \item Define 
+  \begin{tcolorbox}[colframe=red,title=Definition 4 and 5]
+    \begin{itemize}
+      \item Define two linear operators $\mathcal{L}:\mathcal{H}^{F}\to\mathcal{H}$ and  $\mathcal{M}:\mathcal{H}^{F}\to\mathcal{H}^{F}$
       \[
-        L\{h_F\}=\E\!\big[h_F(Z)\mid C,\,G_C(Z)\big],\quad
-        M\{h_F\}=\E\!\big[L\{h_F\}\mid Z\big].
+        \mathcal{L}\{h^{F}\} = \E\!\left[h^{F}(Z)\mid C,G_C(Z)\right],
+        \qquad
+        \mathcal{M}\{h^{F}\} = \E\!\left[\mathcal{L}\{h^{F}\}\mid Z\right].
       \]
-    \item Projection for any $h_F$:
-      \[
-      \Pi\!\left[\,I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)}\,\middle|\,\mathcal{A}\right]
-      = I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)} - L\!\left\{M^{-1}h_F\right\}.
-      \]
-    \item $M^{-1}$ exists (unique). In hard cases: approximate by successive approximations.
-  \end{itemize}
-  % Defs (10.78)–(10.82); existence/uniqueness and iterative scheme (Lemma 10.5 / Thm 10.6)
-  % :contentReference[oaicite:24]{index=24}  :contentReference[oaicite:25]{index=25}  :contentReference[oaicite:26]{index=26}
+      where $h^F$ is an arbitrary element in $\mathcal{H}^F$.
+    \end{itemize}
+  \end{tcolorbox}
 \end{frame}
 
-% ----------------------------------------------------------
+\begin{frame}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.6]
+    \begin{itemize}
+      \item Inverse operator $\mathcal{M}^{-1}$ exists and is uniquely defined. 
+      \item Moreover, the projection is given by
+      \[
+        \Pi\!\left[
+        \frac{\mathbf{1}(C=\infty)h_F(Z)}{\pi(\infty,Z)}
+        \,\Bigg|\, \Lambda_2
+        \right]
+        = \frac{\mathcal{1} (C=\infty)h_F(Z)}{\pi(\infty,Z)} 
+        - \mathcal{L}\!\big[\,\mathcal{M}^{-1}\{h_F(\cdot)\}\big],
+    \]
+    where
+    \[
+        L\{h_F(\cdot)\} = \sum_{r=1}^{\infty} I(C=r)\,\E\{h_F(Z)\mid G_r(Z)\},
+    \]
+    and
+    \[
+        M\{h_F(\cdot)\} = \sum_{r=1}^{\infty} \#\{r,G_r(Z)\}\,\E\{h_F(Z)\mid G_r(Z)\}.
+    \]
+    \end{itemize}
+  \end{tcolorbox}
+\end{frame}
+
 \section{11. Locally Efficient Estimators for Coarsened-Data Semiparametric Models}
-% ----------------------------------------------------------
 
 \begin{frame}{Roadmap for Chapter 11}
   \begin{itemize}
