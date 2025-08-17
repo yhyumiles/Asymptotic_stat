@@ -1,70 +1,336 @@
-\documentclass[xcolor=dvipsnames,aspectratio=169]{beamer} 
+\documentclass[xcolor=dvipsnames,aspectratio=169]{beamer}
 \usetheme{metropolis}
 \usefonttheme{professionalfonts}
 \setbeamertemplate{theorems}[numbered]
-\usepackage{newtxtext}           
-\usepackage{amsmath,amssymb,amsthm} 
+
+\usepackage{newtxtext}
+\usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{tcolorbox}
 \usepackage{tikz}
+\usepackage{bbm}
+\usepackage{ascmac}
 \everymath{\displaystyle}
+
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{ex}[thm]{Example}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{rmk}[thm]{Remark}
-\usepackage{bbm}
-\usepackage{ascmac}
+
 \newcommand{\indep}{\mathop{\perp\!\!\!\!\perp}}
-\newcommand{\R}{\mathbb{R}} 
-\newcommand{\N}{\mathbb{N}} 
-\newcommand{\Z}{\mathbb{Z}} 
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
 \newcommand{\C}{\mathbb{C}}
-\newcommand{\Q}{\mathbb{Q}} 
+\newcommand{\Q}{\mathbb{Q}}
 \newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\1}{\mathbbm{1}}
 
-\begin{document} 
-
-\title{Tsiatis (2006) Chapter 10-11\\ \small{Asymptotic Statistics 2025 summer reading group}}
-\author{Naoki Eguchi}          
-\institute{Faculty of Medicine, Kyoto University} 
+% --- Title metadata ---
+\title{Tsiatis (2006) Chapters 10--11\\ \small{Asymptotic Statistics 2025 Summer Reading Group}}
+\author{Naoki Eguchi}
+\institute{Faculty of Medicine, Kyoto University}
 \date{\today}
 
-\begin{frame}                  
-    \titlepage                     
+\begin{document}
+
+% ----------------------------------------------------------
+% Title + agenda
+% ----------------------------------------------------------
+\begin{frame}
+  \titlepage
 \end{frame}
 
-\begin{frame}{Today's agenda}                  
-    \begin{itemize}
-        \item Introduction: 
-    \end{itemize}
+\begin{frame}{Today's agenda}
+  \begin{itemize}
+    \item Recap: Coarsened data, IF geometry, AIPWCC in one slide
+    \item Chapter 10: Two-level missingness $\Rightarrow$ efficient AIPWCC \& DR
+    \item \emph{Skip (brief mention only):} monotone coarsening details, censoring
+    \item Generalization idea (operators $L,\,M,\,M^{-1}$) for later use
+    \item Chapter 11: Locally efficient estimators (two representations; how to compute)
+    \item Practical recipe: what to implement in 2h
+  \end{itemize}
+  % Sources: overview of AIPWCC machinery and DR linear space J(!F^\perp) in Ch.10–11
+  % :contentReference[oaicite:10]{index=10}  :contentReference[oaicite:11]{index=11}
 \end{frame}
 
+% ----------------------------------------------------------
 \section{Recap}
+% ----------------------------------------------------------
 
-\begin{frame}
-    
+\begin{frame}{Coarsened data \& notation: 10-second recap}
+  \begin{itemize}
+    \item Full data $Z$; observed data $\{C,\,G_C(Z)\}$ under CAR.
+    \item Complete-case weights: $\pi(\infty,Z,\psi)=P(C=\infty\mid Z)$.
+    \item AIPWCC estimating function for full-data $m(Z,\beta)$:
+    \[
+      I(C=\infty)\frac{m(Z,\beta)}{\pi(\infty,Z,\psi)}\;+\;L_2\{C,G_C(Z),\beta,\psi\},
+    \]
+    where $L_2\in\mathcal{A}$ (augmentation space) is chosen to reduce variance.
+  \end{itemize}
+  \begin{tcolorbox}[title=Key idea, colback=gray!5!white]
+  Among all AIPWCC with fixed full-data $m$, choose $L_2=-\Pi\!\left[I(C=\infty)\,m/\pi \mid \mathcal{A}\right]$:
+  the projection onto the augmentation space gives the variance-optimal element in that class.
+  \end{tcolorbox}
+  % AIPWCC form and projection onto !2: (10.6)–(10.7); definition of DR linear space: Ch.10
+  % :contentReference[oaicite:12]{index=12}  :contentReference[oaicite:13]{index=13}
 \end{frame}
 
-\section{10. Improving Efficiency and Double Robustness with Coarsened Data}
-
-\begin{frame}
-    \begin{itemize}
-        \item 
-    \end{itemize}
+\begin{frame}{Influence function geometry (for later)}
+  \begin{itemize}
+    \item Full-data Hilbert space $\mathcal{H}_F$; nuisance tangent space $\mathcal{F}$; orthogonal complement $\mathcal{F}^{\perp}$.
+    \item DR linear space: $\mathcal{J}(\mathcal{F}^{\perp})=\{\,\mathcal{J}(\phi_F): \phi_F\in\mathcal{F}^{\perp}\,\}$ with
+    \[
+      \mathcal{J}\{h_F(Z)\}=I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)}-\Pi\!\left[I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)}\middle|\mathcal{A}\right].
+    \]
+    \item Efficient observed-data estimators live in (or are induced by) this DR space.
+  \end{itemize}
+  % DR linear space & operator J(·): Ch.10 Sec.10.1–10.2
+  % :contentReference[oaicite:14]{index=14}
 \end{frame}
 
+% ----------------------------------------------------------
+\section{10. Improving Efficiency \& Double Robustness with Coarsened Data}
+% ----------------------------------------------------------
+
+\begin{frame}{Set-up: Two-level missingness (our focus)}
+  \begin{itemize}
+    \item Partition $Z=(Z_1^\top,Z_2^\top)^\top$ with $Z_1$ always observed and $Z_2$ sometimes missing.
+    \item Complete-case indicator $R\in\{0,1\}$ with MAR: $P(R=1\mid Z)=P(R=1\mid Z_1)=\pi(Z_1,\psi)$ (e.g., logistic).
+    \item Observed data: $O=(R, Z_1, RZ_2)$.
+  \end{itemize}
+  \vspace{4pt}
+  \begin{tcolorbox}[title=Goal]
+    Build an AIPWCC estimator for $\beta$ with \emph{optimal augmentation}
+    that is consistent and efficient within class, and \emph{double robust} (DR).
+  \end{tcolorbox}
+  % Two-level missingness setup and logistic model for π(Z1,ψ): (10.2)–(10.9)
+  % :contentReference[oaicite:15]{index=15}
+\end{frame}
+
+\begin{frame}{Baseline IPWCC and its limitation}
+  \begin{itemize}
+    \item Given a full-data estimating function $m(Z,\beta)$,
+    \[
+      \sum_{i=1}^n R_i\frac{m(Z_i,\beta)}{\pi(Z_{1i},\psi)}=0 \quad\text{(IPWCC)}
+    \]
+    is consistent if $\pi(\cdot,\psi)$ is correctly specified.
+    \item But it discards information in incomplete cases ($R=0$) $\Rightarrow$ inefficient when missingness is substantial.
+  \end{itemize}
+  \begin{tcolorbox}[title=Fix]
+    Augment with a function of $Z_1$: add $\displaystyle -\frac{R-\pi(Z_1,\psi)}{\pi(Z_1,\psi)}\,h_2(Z_1,\beta)$.
+  \end{tcolorbox}
+  % IPWCC baseline and augmentation pattern
+  % :contentReference[oaicite:16]{index=16}
+\end{frame}
+
+\begin{frame}{Optimal augmentation and adaptive AIPWCC}
+  \begin{itemize}
+    \item \textbf{Optimal} augmentation: $h_2^\star(Z_1,\beta)=\E\!\left[m(Z,\beta)\mid Z_1\right]$.
+    \item In practice, posit a (possibly misspecified) model $p^\ast_{Z_2|Z_1}(\cdot\mid z_1;\xi)$ and compute
+    \[
+      h_2^\ast(Z_1,\beta,\xi)=\int m(z_1,u,\beta)\,p^\ast_{Z_2|Z_1}(u\mid z_1;\xi)\,du.
+    \]
+    \item Estimation: fit $\hat\psi$ by MLE for $\pi(\cdot,\psi)$; fit $\hat\xi^\ast$ by likelihood for the posited model; solve
+    \[
+      \sum_{i=1}^n\left[\frac{R_i}{\pi(Z_{1i},\hat\psi)}m(Z_i,\beta)
+      -\frac{R_i-\pi(Z_{1i},\hat\psi)}{\pi(Z_{1i},\hat\psi)}\,h_2^\ast(Z_{1i},\beta,\hat\xi^\ast)\right]=0.
+    \]
+  \end{itemize}
+  % Optimal augmentation h2*, adaptive plug-in; (10.17)–(10.19)
+  % :contentReference[oaicite:17]{index=17}  :contentReference[oaicite:18]{index=18}
+\end{frame}
+
+\begin{frame}{Double robustness (DR)}
+  \begin{itemize}
+    \item Under regularity, the adaptive AIPWCC estimator is \textbf{consistent} if
+    \[
+      \textit{either}\ \ \pi(Z_1,\psi)\ \text{is correctly specified} \quad \textbf{or}\quad p^\ast_{Z_2|Z_1}(\cdot\mid Z_1;\xi)\ \text{is correct}.
+    \]
+    \item Proof sketch for monotone coarsening: algebraic identity + CAR $\Rightarrow$ decompositions where either model kills the bias term.
+  \end{itemize}
+  \begin{tcolorbox}[title=Takeaway]
+  Adaptive augmentation buys efficiency; the DR structure buys protection against one misspecification.
+  \end{tcolorbox}
+  % DR statement and identity underpinning (10.62)–(10.65) and Theorem 10.5
+  % :contentReference[oaicite:19]{index=19}  :contentReference[oaicite:20]{index=20}
+\end{frame}
+
+\begin{frame}{Worked example (logistic regression; design-based missingness)}
+  \begin{itemize}
+    \item Full-data $m(Z,\beta)$ chosen for logistic model of $Y$ on $X=(X_1,X_2)$.
+    \item Under two-level missingness, the AIPWCC form becomes (schematically)
+    \[
+      \sum_i\left[\frac{R_i}{\pi(Y_i,X_{1i};\hat\psi)}\,X^\ast_i\{Y_i-\mu_\beta(X_i)\}
+      -\frac{R_i-\pi(Y_i,X_{1i};\hat\psi)}{\pi(Y_i,X_{1i};\hat\psi)}\,L(Y_i,X_{1i})\right]=0,
+    \]
+    with $L^\star(Y,X_1)=\E\!\left[X^\ast\{Y-\mu_\beta(X)\}\mid Y,X_1\right]$.
+  \end{itemize}
+  % Logistic revisited, (10.38)–(10.39); L* as conditional mean given (Y,X1)
+  % :contentReference[oaicite:21]{index=21}
+\end{frame}
+
+\begin{frame}{What we skip in Ch.~10 (for time)}
+  \begin{itemize}
+    \item Detailed development for \emph{monotone coarsening} and for \emph{censoring} (survival)---we’ll pick up the tools where needed in Ch.~11.
+    \item Nonmonotone coarsening exists but is computationally heavy (iterative projections, integral operators).
+  \end{itemize}
+  \begin{tcolorbox}[title=Pointer]
+    Keep the operators $L$ and $M$ in mind; they will be our bridge to Chapter~11.
+  \end{tcolorbox}
+  % Nonmonotone: caution about feasibility
+  % :contentReference[oaicite:22]{index=22}  :contentReference[oaicite:23]{index=23}
+\end{frame}
+
+\begin{frame}{Generalization idea: operators $L$ and $M$ (you’ll need this)}
+  \begin{itemize}
+    \item Define 
+      \[
+        L\{h_F\}=\E\!\big[h_F(Z)\mid C,\,G_C(Z)\big],\quad
+        M\{h_F\}=\E\!\big[L\{h_F\}\mid Z\big].
+      \]
+    \item Projection for any $h_F$:
+      \[
+      \Pi\!\left[\,I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)}\,\middle|\,\mathcal{A}\right]
+      = I(C=\infty)\frac{h_F(Z)}{\pi(\infty,Z)} - L\!\left\{M^{-1}h_F\right\}.
+      \]
+    \item $M^{-1}$ exists (unique). In hard cases: approximate by successive approximations.
+  \end{itemize}
+  % Defs (10.78)–(10.82); existence/uniqueness and iterative scheme (Lemma 10.5 / Thm 10.6)
+  % :contentReference[oaicite:24]{index=24}  :contentReference[oaicite:25]{index=25}  :contentReference[oaicite:26]{index=26}
+\end{frame}
+
+% ----------------------------------------------------------
 \section{11. Locally Efficient Estimators for Coarsened-Data Semiparametric Models}
+% ----------------------------------------------------------
 
+\begin{frame}{Roadmap for Chapter 11}
+  \begin{itemize}
+    \item Two representations of the efficient observed-data score
+    \item Solving for the efficient full-data element $B_F^{\text{eff}}\in\mathcal{F}^{\perp}$ via $M^{-1}$
+    \item Uniqueness and computation (contraction mapping; successive approximations)
+    \item Special case: only one full-data IF $\Rightarrow$ easy locally efficient estimator
+    \item Restricted moment model: integral equation for $A(X)$; practical approximation $A_{\text{imp}}$
+  \end{itemize}
+  % Chapter overview: (11.1)–(11.4) and Theorem 11.1 narrative
+  % :contentReference[oaicite:27]{index=27}  :contentReference[oaicite:28]{index=28}
+\end{frame}
+
+\begin{frame}{Efficient score: Representation 1 (likelihood-based)}
+  \[
+    S_{\text{eff}}\{C,G_C(Z)\}=S_\beta\{C,G_C(Z)\}-\Pi\big[S_\beta\{C,G_C(Z)\}\mid \mathcal{H}_\eta\big],
+  \]
+  where $S_\beta=\E\big[S^F_\beta(Z)\mid C,G_C(Z)\big]$, and $\mathcal{H}_\eta=\{\,\E[\alpha_F(Z)\mid C,G_C(Z)]:\alpha_F\in\mathcal{F}\,\}$.
+  \begin{itemize}
+    \item Because $S_\beta\perp \mathcal{H}_\psi$, the projection is onto $\mathcal{H}_\eta$ only.
+    \item This form is convenient for direct likelihood calculations.
+  \end{itemize}
+  % Representation 1: (11.7)–(11.9)
+  % :contentReference[oaicite:29]{index=29}
+\end{frame}
+
+\begin{frame}{Efficient score: Representation 2 (AIPWCC-based)}
+  \[
+    S_{\text{eff}}\{C,G_C(Z)\}=\mathcal{J}\big\{B_F^{\text{eff}}(Z)\big\}
+    =I(C=\infty)\frac{B_F^{\text{eff}}(Z)}{\pi(\infty,Z)}-\Pi\!\left[I(C=\infty)\frac{B_F^{\text{eff}}(Z)}{\pi(\infty,Z)}\middle|\mathcal{A}\right].
+  \]
+  \begin{tcolorbox}[title=Bridge]
+    The unique $B_F^{\text{eff}}\in\mathcal{F}^{\perp}$ is characterized by
+    \[
+      \Pi\!\left[M^{-1}\{B_F^{\text{eff}}(Z)\}\;\middle|\;\mathcal{F}^{\perp}\right]=S^{F}_{\text{eff}}(Z).
+    \]
+  \end{tcolorbox}
+  % Representation 2 and Theorem 11.1 (11.12), using M^{-1} from Ch.10
+  % :contentReference[oaicite:30]{index=30}
+\end{frame}
+
+\begin{frame}{Existence, uniqueness, and how to compute $B_F^{\text{eff}}$}
+  \begin{itemize}
+    \item Define $Q\{h_F\}=\Pi\big[(I-M)\{h_F\}\mid \mathcal{F}\big]$. Then $(I-Q)$ is a contraction on $\mathcal{H}_F$.
+    \item Solve $(I-Q)\{M^{-1}B_F^{\text{eff}}\}=S^F_{\text{eff}}$ and invert $(I-Q)$ by iteration:
+    \[
+      D^{(i+1)}=\Pi\big[(I-M)D^{(i)}\mid \mathcal{F}\big]+S^F_{\text{eff}},\quad 
+      B^{(i)}=\Pi\big[M\{D^{(i)}\}\mid \mathcal{F}^{\perp}\big].
+    \]
+    \item Then $B^{(i)}\to B_F^{\text{eff}}$.
+  \end{itemize}
+  % Successive approximation algorithm (11.48)
+  % :contentReference[oaicite:31]{index=31}  :contentReference[oaicite:32]{index=32}
+\end{frame}
+
+\begin{frame}{Special case: only one full-data IF $\Rightarrow$ easy}
+  \begin{itemize}
+    \item If full-data IF is unique (nonparametric mean-type problems), locally efficient AIPWCC coincides with the DR-optimal element built in Ch.~10.
+    \item Example: Estimate $\beta=\E(X_2)$ when only a subsample of $X_2$ is observed with prob.~$\pi(Y,X_1)$.
+    \item Locally efficient estimator:
+    \[
+      \hat\beta
+      =\frac{1}{n}\sum_{i=1}^n\left[\frac{R_iX_{2i}}{\pi(Y_i,X_{1i})}
+      -\frac{R_i-\pi(Y_i,X_{1i})}{\pi(Y_i,X_{1i})}\,\hat\E(X_2\mid Y_i,X_{1i})\right].
+    \]
+    \item If $\E(X_2\mid Y,X_1)$ is linear, OLS among complete cases gives fully efficient $\hat\beta$.
+  \end{itemize}
+  % Single-IF case and example: (11.3)–(11.6)
+  % :contentReference[oaicite:33]{index=33}  :contentReference[oaicite:34]{index=34}  :contentReference[oaicite:35]{index=35}
+\end{frame}
+
+\begin{frame}{Restricted moment model with monotone coarsening}
+  \begin{itemize}
+    \item Full data: $Z=(Y,X)$, $Y=\mu(X,\beta)+\varepsilon$ with $\E(\varepsilon\mid X)=0$.
+    \item Full-data efficient score: $S^F_{\text{eff}}(Z)=D^\top(X)V^{-1}(X)\varepsilon$, $D=\partial\mu/\partial\beta^\top$.
+    \item Seek $B_F^{\text{eff}}(Z)=A(X)\varepsilon \in \mathcal{F}^{\perp}$ solving
+    \[
+      \Pi\!\big[M^{-1}\{A(X)\varepsilon\}\mid \mathcal{F}^{\perp}\big]=S^F_{\text{eff}}(Z).
+    \]
+    \item Leads to an integral equation for $A(X)$; exact solution rare; use numerical/approximate $A_{\text{imp}}$.
+  \end{itemize}
+  % Derivation and integral-equation form; ingredients from (11.38)–(11.40)
+  % :contentReference[oaicite:36]{index=36}
+\end{frame}
+
+\begin{frame}{Approximate locally efficient estimator (practice)}
+  \begin{itemize}
+    \item Compute a numerically feasible $A_{\text{imp}}(X,\hat\beta,\hat\psi,\hat\xi^\ast)$.
+    \item Plug into the AIPWCC efficient-score form:
+    \[
+      \sum_{i=1}^n\left[
+        I(C_i=\infty)\frac{A_{\text{imp}}(X_i,\beta,\hat\psi,\hat\xi^\ast)\{Y_i-\mu(X_i,\beta)\}}{\pi(\infty,Y_i,X_i;\hat\psi)}
+        +L_2\{C_i,G_{C_i}(Y_i,X_i),\beta,\hat\psi,\hat\xi^\ast\}
+      \right]=0.
+    \]
+    \item Here $L_2$ is the projection term (closed form under monotone coarsening).
+  \end{itemize}
+  \vspace{2mm}
+  \begin{tcolorbox}[title=Robustness note]
+  The $A_{\text{imp}}$ route targets local efficiency but may be numerically heavy; when it’s too hard, fall back to the DR AIPWCC from Ch.~10.
+  \end{tcolorbox}
+  % Approximate efficient score and estimator: (11.43)–(11.46)
+  % :contentReference[oaicite:37]{index=37}
+\end{frame}
+
+\begin{frame}{What to implement (2h version)}
+  \begin{itemize}
+    \item \textbf{Two-level missingness}: Fit $\hat\psi$ for $\pi(Z_1,\psi)$ and a flexible model for $p^\ast(Z_2\mid Z_1;\xi)$ (e.g., GLM, GAM, RF).
+    \item Compute $h_2^\ast(Z_1,\beta,\hat\xi^\ast)$ and solve the adaptive AIPWCC equation.
+    \item (Optional) For monotone longitudinal missingness: use the closed-form projection to build $L_2$ and an $A_{\text{imp}}$ working model.
+    \item Diagnostics: overlap of $\pi$, sensitivity to $p^\ast$, variance via sandwich or bootstrap.
+  \end{itemize}
+  % Implementation emphasis consistent with Ch.10–11 guidance
+  % :contentReference[oaicite:38]{index=38}
+\end{frame}
+
+% ----------------------------------------------------------
 \section*{References}
+% ----------------------------------------------------------
 
 \begin{frame}{References}
-    \begin{itemize}
-        \item Tsiatis, Anastasios, (2006).
-        \textit{Semiparametric theory and missing data}, Vol. 4. New York: Springer.
-        \item A.W. Van der Vaart, (1998). 
-        \textit{Asymptotic Statistics}, Cambridge University Press.
-    \end{itemize}
+  \begin{itemize}
+    \item Tsiatis, A. (2006). \emph{Semiparametric Theory and Missing Data}. Springer (Chs. 10–11).
+    \item A.W. van der Vaart (1998). \emph{Asymptotic Statistics}. Cambridge University Press.
+  \end{itemize}
 \end{frame}
 
 \end{document}
