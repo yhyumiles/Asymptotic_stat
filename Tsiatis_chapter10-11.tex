@@ -247,9 +247,19 @@
       where $h^F$ is an arbitrary element in $\mathcal{H}^F$.
     \end{itemize}
   \end{tcolorbox}
+    \[
+        L\{h_F(\cdot)\} = \sum_{r=1}^{\infty} I(C=r)\,\E\{h_F(Z)\mid G_r(Z)\},
+    \]
+    and 
+    \[
+        M\{h_F(\cdot)\} = \sum_{r=1}^{\infty} \#\{r,G_r(Z)\}\,\E\{h_F(Z)\mid G_r(Z)\}.
+    \]
 \end{frame}
 
-\begin{frame}
+\begin{frame}{How to derive the projection : $\Pi\!\left[
+        \frac{\mathbf{1}(C=\infty)h_F(Z)}{\pi(\infty,Z)}
+        \,\Bigg|\, \Lambda_2
+        \right]$}
   \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.6]
     \begin{itemize}
       \item Inverse operator $\mathcal{M}^{-1}$ exists and is uniquely defined. 
@@ -262,14 +272,150 @@
         = \frac{\mathcal{1} (C=\infty)h_F(Z)}{\pi(\infty,Z)} 
         - \mathcal{L}\!\big[\,\mathcal{M}^{-1}\{h_F(\cdot)\}\big],
     \]
-    where
+    \end{itemize}
+  \end{tcolorbox}
+  \begin{itemize}
+    \item By \textbf{Definition 1}, $\mathcal{L}\!\big[\,\mathcal{M}^{-1}\{\varphi^F(Z)\}\big]=\mathcal{J}\{\varphi^F(Z)\}$.
+    \item Therefore, DR linear space is written by $\mathcal{J}(\Lambda^{F\perp})=\mathcal{L}\!\big[\,\mathcal{M}^{-1}\{\Lambda^{F\perp}\}\big]$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Proof sketch for the uniqueness of $\mathcal{M}^{-1}$}
+  \begin{itemize}
+    \item $I-\mathcal{M}$ is a contraction mapping 
     \[
-        L\{h_F(\cdot)\} = \sum_{r=1}^{\infty} I(C=r)\,\E\{h_F(Z)\mid G_r(Z)\},
+    \Leftrightarrow \forall h^F\in\mathcal{H}^F, 0\leq \exists L<1, ||(I-\mathcal{M})h^F||\leq L||h^F||
     \]
-    and
+    \item Existence of $\mathcal{M}^{-1}$ : $\sum_{k=0}^{\infty}(I-\mathcal{M})^k$ (Completeness of linear operator space)
+    \begin{align*}
+      \because \sum_{k=0}^n(I-\mathcal{M})^k\circ \mathcal{M}=I-(I-\mathcal{M})^{n+1}\rightarrow I \tag{as $n\to \infty$}
+    \end{align*}
+    \item Uniqueness of $\mathcal{M}^{-1}$ : $\mathcal{M}^{-1}=\mathcal{M}^{-1}(\mathcal{M}\circ \mathcal{M'}^{-1})=(\mathcal{M}^{-1}\circ \mathcal{M})\mathcal{M'}^{-1}=\mathcal{M'}^{-1}$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Constructing Strategy}
+  \begin{itemize}
+    \item we only focus on the operators $\mathcal{L}, \mathcal{M}^{-1}$ to estimate $\beta$.
     \[
-        M\{h_F(\cdot)\} = \sum_{r=1}^{\infty} \#\{r,G_r(Z)\}\,\E\{h_F(Z)\mid G_r(Z)\}.
+    \sum_{i=1}^{n}
+  \mathcal{L}_{i}\!\left[
+    \mathcal{M}_{i}^{-1}\{\, m(Z_{i},\beta)\,\}
+  \right]
+= 0.
     \]
+    \begin{itemize}
+      \item $\mathcal{L}$ : posit model $\xi$ for conditional probability of $Z$ given $G_r(Z)$ → $\mathcal{L}(\cdot, \xi)$
+      \item $\mathcal{M}^{-1}$ : $\psi$ for coarsening probability, posit model $\xi$ (same above) → $\mathcal{M}^{-1}(\cdot, \psi, \xi)$
+    \end{itemize}
+    \item To construct $\beta$, after estimating $\psi$ for $\hat{\psi_n}$, and $\xi$ for $\hat{\xi_n^*}$, solve the equation
+    \[
+    \sum_{i=1}^{n}
+  \mathcal{L}_{i}\!\left[
+    \mathcal{M}_{i}^{-1}\{\, m(Z_{i},\beta),\, \hat{\psi}_{n},\, \hat{\xi}^{\ast}_{n}\,\},
+    \, \hat{\xi}^{\ast}_{n}
+  \right]
+= 0
+    \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Equivalence of $\mathcal{L}\circ \mathcal{M}^{-1}$ and AIPWCC}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.7 - (i)]
+    \begin{itemize}
+        \item Let $d^F(Z,\beta,\psi,\xi) = \mathcal{M}^{-1}\{m(Z,\beta),\psi,\xi\}$, then, the residual can separate
+        \begin{align*}
+          \mathcal{L}[\mathcal{M}^{-1}\{m(Z,\beta),\psi,\xi\},\xi]
+            &= \mathcal{L}\{d_F(Z,\beta,\psi,\xi),\xi\} \\
+            &=\underbrace{\frac{I(C=\infty)\,m(Z,\beta)}{\pi(\infty,Z,\psi)}}_{\text{IPWCC space}}
+            + \underbrace{L^{\ast}_2\{C,G_C(Z),\beta,\psi,\xi\}}_{\text{Augmentation space}}.
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+  \begin{itemize}
+    \item This means the solution to this estimating equation is an AIPWCC estimator
+    \[
+    \sum_{i=1}^{n}
+  \frac{I(C_{i}=\infty)\,m(Z_{i},\beta)}
+       {\varpi(\infty,Z_{i},\hat{\psi}_{n})}
+  + L^{\ast}_{2}\{\,C_{i},G_{C_{i}}(Z_{i}),\beta,\hat{\psi}_{n},\hat{\xi}^{\ast}_{n}\}
+= 0.
+    \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The part of augmentation space}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.7 - (ii)]
+    \begin{itemize}
+        \item The element of the augmentation space is written by
+        \begin{align*}
+          &L^{\ast}_2\{C,G_C(Z),\beta,\psi,\xi\}
+            =\\  &- \frac{I(C=\infty)}{\pi(\infty,Z,\psi)}
+            \Bigg(\sum_{r\neq\infty}\pi(r,G_r(Z),\psi)\,
+            \E[d_F(Z,\beta,\psi,\xi)\mid G_r(Z),\xi]\Bigg) \\
+            &+ \sum_{r\neq\infty} I(C=r)\,
+            \E[d_F(Z,\beta,\psi,\xi)\mid G_r(Z),\xi]
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+\begin{itemize}
+  \item Let $L_{2r}\{G_r(Z)\}=-\E[d_F(Z,\beta,\psi,\xi)\mid G_r(Z),\xi]$, we can obtain the same representation as a typical element of $\Lambda_2$. (see (7.37))
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Construct $\mathcal{M}^{-1}$ and $\mathcal{L}$}
+  \begin{itemize}
+    \item $\mathcal{M}^{-1}$ is represented by infinite series, so be constructed by successive approximation.
+    \[
+    d^F_{(j)}(Z,\beta,\psi,\xi) = \hat{\mathcal{M}}^{-1}\{m(Z,\beta),\psi,\xi\}
+    \]
+    \item By construction, $L^{\ast}_2\{C,G_C(Z),\beta,\psi,\xi\}\in \Lambda_2$ in any cases.
+    \item This means that when $\psi_0$ (coarsening probability model) is correctly specified, 
+    \[
+    \frac{I(C=\infty)\,m(Z,\beta_{0})}{\varpi(\infty,Z,\psi_{0})}
+\;+\;
+L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
+    \]
+    \item Hence, we can obtain an AIPWCC estimator by solving
+    \[
+    \sum_{i=1}^{n}
+  \frac{I(C_{i}=\infty)\,m(Z_{i},\beta)}
+       {\varpi(\infty,Z_{i},\hat{\psi}_{n})}
+  + L^{\ast}_{2(j)}\{\,C_{i},G_{C_{i}}(Z_{i}),\beta,\hat{\psi}_{n},\hat{\xi}^{\ast}_{n}\}
+= 0.
+    \]
+    \item The estimator is RAL (i.e. consistent and asymptotically normal)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Double Robustness}
+  \begin{itemize}
+    \item In addition to correct specification of $\psi$, the posit model $p_Z^*(z,\xi)$ is correctly specified, its influence function is \alert{efficient}. (double-robustness)
+    \item Also, the AIPWCC estimator is consistent and asymptotically normal even if $\psi$ is misspecified. (Actually, we do not have to consider this pattern \alert{thanks to CAR})
+    \item 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.8]
+    \begin{itemize}
+      \item This theorem establishes the \textbf{double robustness} property.
+      \item Specifically:
+      \[
+        \mathbb{E}_{\xi_0,\psi_0}
+        \left[
+          L\!\left(M^{-1}\{m(Z,\beta_0),\psi_0,\xi^\ast\},\,\xi^\ast\right)
+        \right] = 0,
+      \]
+      and
+      \[
+        \mathbb{E}_{\xi_0,\psi_0}
+        \left[
+          L\!\left(M^{-1}\{m(Z,\beta_0),\psi^\ast,\xi_0\},\,\xi_0\right)
+        \right] = 0.
+      \]
+      \item Hence, the estimating equation remains unbiased if either
+      the coarsening model ($\psi$) or the marginal model of $Z$ ($\xi$) is correctly specified.
     \end{itemize}
   \end{tcolorbox}
 \end{frame}
@@ -431,6 +577,12 @@
   \end{tcolorbox}
 \end{frame}
 
+\section{11.2 Strategy for Obtaining Improved Estimators}
+
+\begin{frame}
+  
+\end{frame}
+
 \begin{frame}{Special case: only one full-data IF $\Rightarrow$ easy}
   \begin{itemize}
     \item If full-data IF is unique (nonparametric mean-type problems), locally efficient AIPWCC coincides with the DR-optimal element built in Ch.~10.
@@ -447,18 +599,16 @@
   % :contentReference[oaicite:33]{index=33}  :contentReference[oaicite:34]{index=34}  :contentReference[oaicite:35]{index=35}
 \end{frame}
 
-\begin{frame}{Restricted moment model with monotone coarsening}
+\begin{frame}{locally efficient estimator for restricted moment model with monotone coarsening}
   \begin{itemize}
-    \item Full data: $Z=(Y,X)$, $Y=\mu(X,\beta)+\varepsilon$ with $\E(\varepsilon\mid X)=0$.
-    \item Full-data efficient score: $S^F_{\text{eff}}(Z)=D^\top(X)V^{-1}(X)\varepsilon$, $D=\partial\mu/\partial\beta^\top$.
+    \item Full data: $Z=(Y,X)$, Model: $Y=\mu(X,\beta)+\varepsilon$ with $\E(\varepsilon\mid X)=0$.
+    \item Full-data efficient score: $S^F_{\text{eff}}(Z)=D^\top(X)V^{-1}(X)\varepsilon$, $D=\partial\mu/\partial\beta^\top, V(X)=\text{Var}(Y|X)$.
     \item Seek $B_F^{\text{eff}}(Z)=A(X)\varepsilon \in \mathcal{F}^{\perp}$ solving
     \[
       \Pi\!\big[M^{-1}\{A(X)\varepsilon\}\mid \mathcal{F}^{\perp}\big]=S^F_{\text{eff}}(Z).
     \]
     \item Leads to an integral equation for $A(X)$; exact solution rare; use numerical/approximate $A_{\text{imp}}$.
   \end{itemize}
-  % Derivation and integral-equation form; ingredients from (11.38)–(11.40)
-  % :contentReference[oaicite:36]{index=36}
 \end{frame}
 
 \begin{frame}{Approximate locally efficient estimator (practice)}
