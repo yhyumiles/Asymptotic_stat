@@ -278,42 +278,73 @@
 
 \begin{frame}{Roadmap for Chapter 11}
   \begin{itemize}
-    \item Two representations of the efficient observed-data score
-    \item Solving for the efficient full-data element $B_F^{\text{eff}}\in\mathcal{F}^{\perp}$ via $M^{-1}$
-    \item Uniqueness and computation (contraction mapping; successive approximations)
-    \item Special case: only one full-data IF $\Rightarrow$ easy locally efficient estimator
-    \item Restricted moment model: integral equation for $A(X)$; practical approximation $A_{\text{imp}}$
+    \item For a full-data estimating function $m(Z,\beta)\in \Lambda^{F\perp}$, applying $\mathcal{J}$, we obtain an observed-data estimating function.
+    \[
+    \sum_{i=1}^n \left[
+  \frac{ I(C_i = \infty) m(Z_i,\beta) }
+       { \varpi(\infty, Z_i, \hat{\psi}_n) }
+  - \Pi\!\left(
+    \frac{ I(C_i = \infty) m(Z_i,\beta) }
+         { \varpi(\infty, Z_i) }
+    \;\middle|\; \Lambda_2
+  \right)
+\right] = 0
+    \]
+    \item For computation, we need to estimate $\psi$ in the former, $\xi$ (posit model) inthe latter.
+    \item We propose a locally efficient estimator, which achieves the semiparametric efficiency bound if the posited model $p_Z^*(z,\xi)$ is correct but still be consistent and asymptotically normal and RAL even if misspecified.
+    \item Recall the essential framework : Efficient score → Efficient IF (proportional relationship)
   \end{itemize}
-  % Chapter overview: (11.1)–(11.4) and Theorem 11.1 narrative
-  % :contentReference[oaicite:27]{index=27}  :contentReference[oaicite:28]{index=28}
 \end{frame}
 
-\begin{frame}{Efficient score: Representation 1 (likelihood-based)}
-  \[
-    S_{\text{eff}}\{C,G_C(Z)\}=S_\beta\{C,G_C(Z)\}-\Pi\big[S_\beta\{C,G_C(Z)\}\mid \mathcal{H}_\eta\big],
-  \]
-  where $S_\beta=\E\big[S^F_\beta(Z)\mid C,G_C(Z)\big]$, and $\mathcal{H}_\eta=\{\,\E[\alpha_F(Z)\mid C,G_C(Z)]:\alpha_F\in\mathcal{F}\,\}$.
+\section{11.1 The Observed-Data Efficient Score}
+
+\begin{frame}{Efficient score: Representation 1 (likelihood-based) : theoritical}
   \begin{itemize}
-    \item Because $S_\beta\perp \mathcal{H}_\psi$, the projection is onto $\mathcal{H}_\eta$ only.
-    \item This form is convenient for direct likelihood calculations.
+    \item Basiccaly, the efficient score is given by 
+  \[
+    S_{\text{eff}}\{C,G_C(Z)\}=S_\beta\{C,G_C(Z)\}-\Pi\big[S_\beta\{C,G_C(Z)\}\mid \Lambda \big],
+  \]
+  where $S_\beta=\E\big[S^F_\beta(Z)\mid C,G_C(Z)\big]$, and $\Lambda=\Lambda_{\psi}\oplus \Lambda_{\eta}\ \ (\Lambda_{\psi}\perp \Lambda_{\eta})$.
+    \begin{align*}
+      \Pi\big[S_\beta\{C,G_C(Z)\}\mid \Lambda \big]&=\Pi\big[S_\beta\{C,G_C(Z)\}\mid \Lambda_{\psi} \big]+\Pi\big[S_\beta\{C,G_C(Z)\}\mid \Lambda_{\eta} \big] \\
+      &=\Pi\big[S_\beta\{C,G_C(Z)\}\mid \Lambda_{\eta} \big] \tag{\because $S_\beta\{C,G_C(Z)\}\perp \Lambda_2$}
+    \end{align*}
+    \item Recall $\Lambda_{\eta}=\{\E[\alpha^F(Z)\mid C,G_C(Z)] : \alpha^F(Z)\in\Lambda^F\}$, there exists $\alpha_{\text{eff}}^F(Z)\in \Lambda^F$, 
+        \[
+    \Pi\big[S_\beta\{C,G_C(Z)\}\mid \Lambda_{\eta} \big]=\E[\alpha_{\text{eff}}^F(Z)\mid C,G_C(Z)]
+    \]
+    \begin{align*}
+      \therefore  S_{\text{eff}}\{C, G_C(Z)\}
+&= S_{\beta}\{C, G_C(Z)\}
+  - \Pi\!\big[ S_{\beta}\{C, G_C(Z)\} \,\big|\, \Lambda_{\eta} \big] \\
+      &=
+      E\!\left[ \, \big\{ S^{F}_{\beta}(Z) - \alpha^{F}_{\text{eff}}(Z) \big\}
+   \,\big|\, C, G_C(Z) \right]
+    \end{align*}
   \end{itemize}
-  % Representation 1: (11.7)–(11.9)
-  % :contentReference[oaicite:29]{index=29}
 \end{frame}
 
-\begin{frame}{Efficient score: Representation 2 (AIPWCC-based)}
+\begin{frame}{Efficient score: Representation 2 (AIPWCC-based) : practical}
+  \begin{itemize}
+    \item Since the full-data efficient score $B^F(Z)\in \Lambda^{F\perp}$, we can apply $\mathcal{J}$.
   \[
     S_{\text{eff}}\{C,G_C(Z)\}=\mathcal{J}\big\{B_F^{\text{eff}}(Z)\big\}
-    =I(C=\infty)\frac{B_F^{\text{eff}}(Z)}{\pi(\infty,Z)}-\Pi\!\left[I(C=\infty)\frac{B_F^{\text{eff}}(Z)}{\pi(\infty,Z)}\middle|\mathcal{A}\right].
+    =I(C=\infty)\frac{B_F^{\text{eff}}(Z)}{\pi(\infty,Z)}-\Pi\!\left[I(C=\infty)\frac{B_F^{\text{eff}}(Z)}{\pi(\infty,Z)}\middle|\Lambda_2 \right].
   \]
-  \begin{tcolorbox}[title=Bridge]
-    The unique $B_F^{\text{eff}}\in\mathcal{F}^{\perp}$ is characterized by
-    \[
-      \Pi\!\left[M^{-1}\{B_F^{\text{eff}}(Z)\}\;\middle|\;\mathcal{F}^{\perp}\right]=S^{F}_{\text{eff}}(Z).
-    \]
-  \end{tcolorbox}
-  % Representation 2 and Theorem 11.1 (11.12), using M^{-1} from Ch.10
-  % :contentReference[oaicite:30]{index=30}
+  \item Clearly, this element lives in DR linear space $\mathcal{J}(\Lambda^{F\perp})$
+  \item Now, we obtain two equivalent representations about the efficient score
+  \[
+  \mathbb{E}\!\left[\, S^{F}_{\beta}(Z) - \alpha^{F}_{\mathrm{eff}}(Z) \,\middle|\, C,\, G_{C}(Z) \right]
+=
+\frac{I(C=\infty)\, B^{F}_{\mathrm{eff}}(Z)}{\varpi(\infty, Z)}
+\;-\;
+\Pi\!\left[
+  \frac{I(C=\infty)\, B^{F}_{\mathrm{eff}}(Z)}{\varpi(\infty, Z)}
+  \,\middle|\, \Lambda_{2}
+\right]
+  \]
+  \item For computation, this AIPWCC estimator is far more practical but still be difficult to construct. → Efficiency problem boils down to find $B^{F}_{\mathrm{eff}}(Z)$.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Existence, uniqueness, and how to compute $B_F^{\text{eff}}$}
@@ -326,8 +357,78 @@
     \]
     \item Then $B^{(i)}\to B_F^{\text{eff}}$.
   \end{itemize}
-  % Successive approximation algorithm (11.48)
-  % :contentReference[oaicite:31]{index=31}  :contentReference[oaicite:32]{index=32}
+\end{frame}
+
+\begin{frame}{How to derive $B^{F}_{\mathrm{eff}}(Z)$}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 11.1]
+    \begin{itemize}
+      \item $B^{F}_{\mathrm{eff}}(Z)\in \Lambda^{F\perp}$ is the unique solution to
+      \[
+        \Pi\!\left[ \mathcal{M}^{-1}\{B^{F}(Z)\} \;\middle|\; \Lambda^{F\perp} \right]
+        \;=\; S^{F}_{\mathrm{eff}}(Z),
+      \]
+    \end{itemize}
+  \end{tcolorbox}
+  \begin{itemize}
+    \item Thereofore, solving this equation, we obtain $B^{F}_{\mathrm{eff}}(Z)$, then we can construct teh efficient score (Note : This is revisit)
+    \[
+    S_{\mathrm{eff}}\{C,G_C(Z)\}
+=
+\frac{I(C=\infty)\,B^{F}_{\mathrm{eff}}(Z)}{\varpi(\infty,Z)}
+-
+\Pi\!\left[
+  \frac{I(C=\infty)\,B^{F}_{\mathrm{eff}}(Z)}{\varpi(\infty,Z)}
+  \;\middle|\; \Lambda_2
+\right],
+    \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computational focus : $\mathcal{M}^{-1}$}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 11.2]
+    \begin{itemize}
+      \item Suppose the coarsening mechanism is \textbf{monotone}.
+      \item For any $h^{F}(Z)\in\mathcal{H}^{F}$, the inverse operator $M^{-1}$ has the closed form
+      \[
+        M^{-1}\{h^{F}(Z)\}
+        = \frac{h^{F}(Z)}{\varpi(\infty,Z)}
+        - \sum_{r\neq\infty}
+          \frac{\lambda_{r}\{G_{r}(Z)\}}{K_{r}\{G_{r}(Z)\}}
+          \,\mathbb{E}\!\left[ h^{F}(Z)\mid G_{r}(Z)\right],
+      \]
+      where
+      \[
+        K_{r}(Z) = \Pr(C\ge r+1\mid Z), 
+        \quad
+        \lambda_{r}\{G_{r}(Z)\} = \Pr(C=r\mid C\ge r, Z).
+      \]
+      \item Hence, $M^{-1}$ can be computed explicitly in terms of the hazard and survival functions of the coarsening distribution.
+    \end{itemize}
+  \end{tcolorbox}
+  \begin{tcolorbox}[colframe=lightgray,title=Lemma 11.2]
+    \begin{itemize}
+      \item Let $\{D^{(k)}\}$ be defined recursively by
+      \[
+        D^{(k+1)}(Z)
+        =
+        \Pi\!\Big((I-M)D^{(k)}(Z)\,\Big|\,\mathcal{H}^{F}\Big)
+        + S^{F}_{\mathrm{eff}}(Z),
+      \]
+      with $D^{(0)}$ arbitrary.
+      \item Then
+      \[
+        D^{(k)} \;\longrightarrow\; D^{F}_{\mathrm{eff}}
+        \quad\text{in $\mathcal{H}^{F}$ norm,}
+      \]
+      and
+      \[
+        B^{(k)}(Z)
+        = \Pi\!\big(MD^{(k)}(Z)\,\big|\;\Lambda^{F\perp}\big)
+        \;\longrightarrow\; B^{F}_{\mathrm{eff}}(Z).
+      \]
+      \item Thus, the successive approximation scheme converges to the efficient element $B^{F}_{\mathrm{eff}}(Z)$.
+    \end{itemize}
+  \end{tcolorbox}
 \end{frame}
 
 \begin{frame}{Special case: only one full-data IF $\Rightarrow$ easy}
