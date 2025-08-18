@@ -106,7 +106,7 @@
   \end{itemize}
 \end{tcolorbox}
 \begin{itemize}
-    \item \textit{Remark 1} : If we know $\psi_0$, we can choose optimal IF. \\
+    \item \textit{Remark 1} : If we \alert{know $\psi_0$}, we can choose optimal IF. \\
     Also, we do not have to estimate $\psi$ because $\Lambda_{\psi}\subset \Lambda_2$ (already subtracted !)
 \end{itemize}
 \end{frame}
@@ -142,43 +142,66 @@
   \end{tcolorbox}
 \end{frame}
 
-\begin{frame}
-    
+\begin{frame}{DR linear space}
+    \begin{itemize}
+      \item $(\mathrm{IF})^F=\varphi^F(Z)+\mathcal{T}^{F\perp}$ is a linear variety in $\mathcal{H}^F$.
+      \item Since $\mathcal{J}$ is \alert{linear} operator, $(\mathrm{IF})_{\mathrm{DR}}=\mathcal{J}\{(\mathrm{IF})^F\}=\mathcal{J}(\varphi^F)+\mathcal{J}(\mathcal{T}^{F\perp})$ in $\mathcal{H}$.
+    \end{itemize}
+    \begin{tcolorbox}[colframe=red,title=Definition 3]
+    \begin{itemize}
+      \item The linear subspace
+      \[
+        \mathcal{J}(\Lambda^{F\perp}) \;\subset\; \Lambda^{\perp} \;\subset\; \mathcal{H},
+      \]
+      is called the \textbf{DR linear space}.
+      \item Explicitly,
+      \[
+        \mathcal{J}(\Lambda^{F\perp})
+        =
+        \Bigl\{\, \mathcal{J}(\varphi^{F}) : \varphi^{F}(Z)\in\Lambda^{F\perp} \,\Bigr\},
+      \]
+    \end{itemize}
+  \end{tcolorbox}
 \end{frame}
+
+\section{10.2 Improving Efficiency with Two Levels of Missingness}
 
 \begin{frame}{Set-up: Two-level missingness}
   \begin{itemize}
     \item Partition $Z=(Z_1^\top,Z_2^\top)^\top$ with $Z_1$ always observed and $Z_2$ sometimes missing.
-    \item Complete-case indicator $R\in\{0,1\}$ with MAR: $P(R=1\mid Z)=P(R=1\mid Z_1)=\pi(Z_1,\psi)$ (e.g., logistic).
+    \item Complete-case indicator $R\in\{0,1\}$ with MAR: \\ $P(R=1\mid Z)=P(R=1\mid Z_1)=\pi(Z_1,\psi)$ (e.g., logit model).
     \item Observed data: $O=(R, Z_1, RZ_2)$.
+    \item In this case, $\frac{I(C=\infty)\,\varphi^{\ast F}(Z)}
+     {\varpi(\infty,Z)}=\frac{R\varphi^{\ast F}(Z)}{\pi(Z_1)}$ for $\varphi^{\ast F}(Z)=m(Z,\beta_0)\in \Lambda^{F\perp}$, hence, we want to find its projection onto $\Lambda_2$.
+    \item Also, $\Lambda_2=\{\frac{R-\pi(Z_1)}{\pi(Z_1)}\,h_2(Z_1,\beta) : \forall h_2 : Z_1\rightarrow \mathbb{R}^q\}$
   \end{itemize}
-  \vspace{4pt}
-  \begin{tcolorbox}[title=Goal]
-    Build an AIPWCC estimator for $\beta$ with \emph{optimal augmentation}
-    that is consistent and efficient within class, and \emph{double robust} (DR).
-  \end{tcolorbox}
-  % Two-level missingness setup and logistic model for π(Z1,ψ): (10.2)–(10.9)
-  % :contentReference[oaicite:15]{index=15}
 \end{frame}
 
-\begin{frame}{Baseline IPWCC and its limitation}
-  \begin{itemize}
-    \item Given a full-data estimating function $m(Z,\beta)$,
-    \[
-      \sum_{i=1}^n R_i\frac{m(Z_i,\beta)}{\pi(Z_{1i},\psi)}=0 \quad\text{(IPWCC)}
-    \]
-    is consistent if $\pi(\cdot,\psi)$ is correctly specified.
-    \item But it discards information in incomplete cases ($R=0$) $\Rightarrow$ inefficient when missingness is substantial.
-  \end{itemize}
-  \begin{tcolorbox}[title=Fix]
-    Augment with a function of $Z_1$: add $\displaystyle -\frac{R-\pi(Z_1,\psi)}{\pi(Z_1,\psi)}\,h_2(Z_1,\beta)$.
+\begin{frame}{Finding the Projection onto the Augmentation space}
+  \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.2]
+    \begin{itemize}
+      \item The projection of 
+      \[
+        \frac{R\,\varphi^{\ast F}(Z)}{\pi(Z_{1})}
+      \]
+      onto the augmentation space $\Lambda_{2}$ is the unique element
+      \[
+        \Biggl(\frac{R-\pi(Z_{1})}{\pi(Z_{1})}\Biggr)h^{0}_{2}(Z_{1}) \;\in\; \Lambda_{2},
+      \]
+      where
+      \[
+        h^{0}_{2}(Z_{1}) = \E\!\left[\varphi^{\ast F}(Z)\mid Z_{1}\right].
+      \]
+    \end{itemize}
   \end{tcolorbox}
-  % IPWCC baseline and augmentation pattern
-  % :contentReference[oaicite:16]{index=16}
+  \begin{itemize}
+    \item For implementaion, we just compute $\E\!\left[\varphi^{\ast F}(Z)\mid Z_{1}\right]$. 
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Optimal augmentation and adaptive AIPWCC}
+\begin{frame}{Adaptive estimation and its algorithm}
   \begin{itemize}
+    \item Consider the case where we can \alert{choose} an estimating function $m(Z,\beta)$.
     \item \textbf{Optimal} augmentation: $h_2^\star(Z_1,\beta)=\E\!\left[m(Z,\beta)\mid Z_1\right]$.
     \item In practice, posit a (possibly misspecified) model $p^\ast_{Z_2|Z_1}(\cdot\mid z_1;\xi)$ and compute
     \[
@@ -186,12 +209,53 @@
     \]
     \item Estimation: fit $\hat\psi$ by MLE for $\pi(\cdot,\psi)$; fit $\hat\xi^\ast$ by likelihood for the posited model; solve
     \[
-      \sum_{i=1}^n\left[\frac{R_i}{\pi(Z_{1i},\hat\psi)}m(Z_i,\beta)
-      -\frac{R_i-\pi(Z_{1i},\hat\psi)}{\pi(Z_{1i},\hat\psi)}\,h_2^\ast(Z_{1i},\beta,\hat\xi^\ast)\right]=0.
+      \sum_{i=1}^n\left[\frac{R_i}{\pi(Z_{1i},\hat\psi_n)}m(Z_i,\beta)
+      -\frac{R_i-\pi(Z_{1i},\hat\psi_n)}{\pi(Z_{1i},\hat\psi_n)}\,h_2^\ast(Z_{1i},\beta,\hat\xi_n^\ast)\right]=0.
     \]
+    \item This estimation strategy is relatively easy to implement.
   \end{itemize}
-  % Optimal augmentation h2*, adaptive plug-in; (10.17)–(10.19)
-  % :contentReference[oaicite:17]{index=17}  :contentReference[oaicite:18]{index=18}
+\end{frame}
+
+\begin{frame}{AIPWCC estimation which is igronrant of $\xi$}
+  \begin{itemize}
+    \item While, using posit model, we can think of the limiting value $h_2^*(Z_{1i},\beta, \xi^*)$.
+    \item Even if $h_2^*(Z_{1i},\beta, \xi^*)\neq h_2^0(Z_{1i},\beta)$, it is a function of $Z_{1i}$, which satisfies the condition that can construct the IF.
+    \[
+    -\left\{
+  \frac{R_{i}-\pi(Z_{1i},\psi_{0})}{\pi(Z_{1i},\psi_{0})}
+ \right\}
+ h^{\ast}_{2}(Z_{1i},\beta_{0},\xi^{\ast})
+ \;\in\;\Lambda_{2}
+    \]
+    \item Therefore, the estimating equation for IF is
+    \[
+    \sum_{i=1}^{n}
+\left[
+  \frac{R_{i}\,m(Z_{i},\beta)}{\pi(Z_{1i},\hat{\psi}_{n})}
+  - \left\{
+      \frac{R_{i}-\pi(Z_{1i},\hat{\psi}_{n})}{\pi(Z_{1i},\hat{\psi}_{n})}
+    \right\}
+    h^{\ast}_{2}(Z_{1i},\beta_{0},\xi^{\ast})
+\right]
+= 0
+    \]
+    \item The only difference is to estimate $\xi_n^*$ or not (AIPWCC requires integration).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Asymptotic equivalence between adaptive estimation and AIPWCC}
+  \begin{itemize}
+    \begin{tcolorbox}[colframe=Cyan,title=Theorem 10.3]
+    Let $\widehat{\beta}_n$ be the estimator obtained by the adaptive estimation, and let $\widehat{\beta}_n^{\ast}$ be the AIPWCC estimator
+    . Under suitable regularity conditions,
+    \[
+      n^{1/2}\!\left(\widehat{\beta}_n-\widehat{\beta}_n^{\ast}\right)\xrightarrow{P}0.
+    \]
+    Hence, the adaptive estimator is asymptotically equivalent to the
+    AIPWCC estimator.
+  \end{tcolorbox}
+  \item Thus, we think misspecification of $\xi$ and its estimation (=adaptive estimation) as a kind of negliguble problem. (BUT no efficiency !)
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Double robustness (DR)}
@@ -391,8 +455,12 @@ L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
 \begin{frame}{Double Robustness}
   \begin{itemize}
     \item In addition to correct specification of $\psi$, the posit model $p_Z^*(z,\xi)$ is correctly specified, its influence function is \alert{efficient}. (double-robustness)
-    \item Also, the AIPWCC estimator is consistent and asymptotically normal even if $\psi$ is misspecified. (Actually, we do not have to consider this pattern \alert{thanks to CAR})
-    \item 
+    \item Also, this AIPWCC estimator is consistent and asymptotically normal even if $\psi$ is misspecified. (Actually, we do not have to consider this pattern \alert{thanks to CAR})
+    \item Recall this two probabilistic model
+    \begin{itemize}
+      \item posit model $p_Z^*(z,\xi)$; estimate $\hat{\xi}_n^* \rightarrow \xi^*(\neq \xi_0)$ (if misspecified)
+      \item coarsening model $\pi\{r, G_r(Z),\psi\}$; estimate $\hat{\psi}_n^*\rightarrow \psi^*(\neq \psi_0)$ (if misspecified)
+    \end{itemize} 
   \end{itemize}
 \end{frame}
 
@@ -493,18 +561,6 @@ L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Existence, uniqueness, and how to compute $B_F^{\text{eff}}$}
-  \begin{itemize}
-    \item Define $Q\{h_F\}=\Pi\big[(I-M)\{h_F\}\mid \mathcal{F}\big]$. Then $(I-Q)$ is a contraction on $\mathcal{H}_F$.
-    \item Solve $(I-Q)\{M^{-1}B_F^{\text{eff}}\}=S^F_{\text{eff}}$ and invert $(I-Q)$ by iteration:
-    \[
-      D^{(i+1)}=\Pi\big[(I-M)D^{(i)}\mid \mathcal{F}\big]+S^F_{\text{eff}},\quad 
-      B^{(i)}=\Pi\big[M\{D^{(i)}\}\mid \mathcal{F}^{\perp}\big].
-    \]
-    \item Then $B^{(i)}\to B_F^{\text{eff}}$.
-  \end{itemize}
-\end{frame}
-
 \begin{frame}{How to derive $B^{F}_{\mathrm{eff}}(Z)$}
   \begin{tcolorbox}[colframe=Cyan,title=Theorem 11.1]
     \begin{itemize}
@@ -530,6 +586,23 @@ L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Proof sketch of Lemma 11.1 : successive approximation}
+  \begin{itemize}
+    \item To construct $B^{F}_{\mathrm{eff}}(Z)$, define $D^{F}_{\mathrm{eff}}(Z)=\mathcal{M}^{-1}\{B^{F}_{\mathrm{eff}}(Z)\}$.
+    \item Then $D^{F}_{\mathrm{eff}}(Z)$ is the solution to 
+    \[
+    S_{\mathrm{eff}}(Z)
+= \Pi\!\bigl[h^{F}(Z)\,\big|\,\Lambda^{F\perp}\bigr]
++ \Pi\!\bigl[\mathcal{M}\{h^{F}(Z)\}\,\big|\,\Lambda^{F}\bigr]
+= (I-\mathcal{Q})\{h^{F}(Z)\}
+    \]
+    where $\mathcal{Q}\{D^{F}_{\mathrm{eff}}(Z)\}
+= \Pi\!\Bigl[(I-\mathcal{M})\{D^{F}_{\mathrm{eff}}(Z)\}\,\Big|\,\Lambda^{F}\Bigr]$
+  \item $\mathcal{Q}$ is a contraction mapping, so $(I-\mathcal{Q})^{-1}$ uniquely exists.
+  \item Finally, we can successively approximate $D^{F}_{\mathrm{eff}}(Z)=(\sum_{i=0}^{\infty}\mathcal{Q}^i)S^{F}_{\mathrm{eff}}(Z)$
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Computational focus : $\mathcal{M}^{-1}$}
   \begin{tcolorbox}[colframe=Cyan,title=Theorem 11.2]
     \begin{itemize}
@@ -551,6 +624,9 @@ L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
       \item Hence, $M^{-1}$ can be computed explicitly in terms of the hazard and survival functions of the coarsening distribution.
     \end{itemize}
   \end{tcolorbox}
+\end{frame}
+
+\begin{frame}
   \begin{tcolorbox}[colframe=lightgray,title=Lemma 11.2]
     \begin{itemize}
       \item Let $\{D^{(k)}\}$ be defined recursively by
@@ -579,24 +655,50 @@ L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
 
 \section{11.2 Strategy for Obtaining Improved Estimators}
 
-\begin{frame}
-  
+\begin{frame}{Estimation scheme}
+  \begin{itemize}
+    \item Consider finding a full-data estimating function $m(Z,\beta)$.
+    \item Firstly, by MLE (or likelihood methods), we estimate $\hat{\psi}_n, \hat{\xi}_n^*$.
+    \item Secondly, we calculate full-data efficient score $S^{\mathrm{eff}}_{F}(Z)$.
+    \item By successive approximation, $\hat{B}^{F}_{\mathrm{eff}}(Z)=m(Z,^beta,\hat{\psi}_n, \hat{\xi}_n^*)$.
+    \item Finally, we can estimate observed-data efficient score using
+    \[
+    S_{\mathrm{eff}}\{C,G_C(Z)\}
+=
+\frac{I(C=\infty)\,B^{F}_{\mathrm{eff}}(Z)}{\varpi(\infty,Z)}
+-
+\Pi\!\left[
+  \frac{I(C=\infty)\,B^{F}_{\mathrm{eff}}(Z)}{\varpi(\infty,Z)}
+  \;\middle|\; \Lambda_2
+\right]
+    \]
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Special case: only one full-data IF $\Rightarrow$ easy}
+\begin{frame}
   \begin{itemize}
-    \item If full-data IF is unique (nonparametric mean-type problems), locally efficient AIPWCC coincides with the DR-optimal element built in Ch.~10.
-    \item Example: Estimate $\beta=\E(X_2)$ when only a subsample of $X_2$ is observed with prob.~$\pi(Y,X_1)$.
-    \item Locally efficient estimator:
-    \[
-      \hat\beta
-      =\frac{1}{n}\sum_{i=1}^n\left[\frac{R_iX_{2i}}{\pi(Y_i,X_{1i})}
-      -\frac{R_i-\pi(Y_i,X_{1i})}{\pi(Y_i,X_{1i})}\,\hat\E(X_2\mid Y_i,X_{1i})\right].
-    \]
-    \item If $\E(X_2\mid Y,X_1)$ is linear, OLS among complete cases gives fully efficient $\hat\beta$.
+    \item Now, we focus on the projection $\Pi\!\left[
+  \frac{ I(C=\infty)\,m(Z,\beta) }{ \varpi(\infty,Z) }
+  \,\Bigg|\, \Lambda_{2}
+\right]$. \\
+    → In some special coarsening mechanism, this projection is simplily written down.
+    \item In actual implementation, we solve this adaptive estimating equation.
+    \begin{align*}
+\sum_{i=1}^{n} \Bigg(
+  &\frac{ I(C_i=\infty)\, m(Z_i,\beta,\hat\psi_n,\hat\xi_n^{*}) }
+        { \varpi(\infty,Z_i,\hat\psi_n) } \\[6pt]
+  &- \frac{ I(C_i=\infty) }{ \varpi(\infty,Z_i,\hat\psi_n) }
+     \Bigg[
+       \sum_{r\neq\infty} \varpi\{r,G_r(Z_i),\hat\psi_n\}\,
+         \E\!\Big\{ D^{(j)}(Z,\beta,\hat\psi_n,\hat\xi_n^{*})
+             \,\Big|\, G_r(Z_i),\hat\xi_n^{*} \Big\}
+     \Bigg] \\[6pt]
+  &+ \sum_{r\neq\infty} I(C_i=r)\,
+      \E\!\Big\{ D^{(j)}(Z,\beta,\hat\psi_n,\hat\xi_n^{*})
+          \,\Big|\, G_r(Z_i),\hat\xi_n^{*} \Big\}
+\Bigg) \;=\; 0
+\end{align*}
   \end{itemize}
-  % Single-IF case and example: (11.3)–(11.6)
-  % :contentReference[oaicite:33]{index=33}  :contentReference[oaicite:34]{index=34}  :contentReference[oaicite:35]{index=35}
 \end{frame}
 
 \begin{frame}{locally efficient estimator for restricted moment model with monotone coarsening}
@@ -627,24 +729,20 @@ L^{\ast}_{2(j)}\{\,C,G_{C}(Z),\beta_{0},\psi_{0},\xi^{\ast}\}\in \Lambda^{\perp}
   \begin{tcolorbox}[title=Robustness note]
   The $A_{\text{imp}}$ route targets local efficiency but may be numerically heavy; when it’s too hard, fall back to the DR AIPWCC from Ch.~10.
   \end{tcolorbox}
-  % Approximate efficient score and estimator: (11.43)–(11.46)
-  % :contentReference[oaicite:37]{index=37}
 \end{frame}
 
-\begin{frame}{What to implement (2h version)}
+\section{11.3 Concluding Thoughts}
+
+\begin{frame}{Summary}
   \begin{itemize}
-    \item \textbf{Two-level missingness}: Fit $\hat\psi$ for $\pi(Z_1,\psi)$ and a flexible model for $p^\ast(Z_2\mid Z_1;\xi)$ (e.g., GLM, GAM, RF).
-    \item Compute $h_2^\ast(Z_1,\beta,\hat\xi^\ast)$ and solve the adaptive AIPWCC equation.
-    \item (Optional) For monotone longitudinal missingness: use the closed-form projection to build $L_2$ and an $A_{\text{imp}}$ working model.
-    \item Diagnostics: overlap of $\pi$, sensitivity to $p^\ast$, variance via sandwich or bootstrap.
+    \item Adaptive estimation : Specified coarsening model → using posit model $\xi$ → fit $\xi_n^*$ 
+    \item Inverse weighted method balances between simplicity of implementation and relative efficiency.
+    \item AIPWCC estimator is more improved one in double robustness and gaining considerable efficiency at the cost of numerical implementaion. (successive approximation)
+    \item Locally efficient estimator aims to find optimal full-data estimating function $B_{\text{eff}}^F(Z)$ as well as optimal augmentation. (difficult to implement) 
   \end{itemize}
-  % Implementation emphasis consistent with Ch.10–11 guidance
-  % :contentReference[oaicite:38]{index=38}
 \end{frame}
 
-% ----------------------------------------------------------
 \section*{References}
-% ----------------------------------------------------------
 
 \begin{frame}{References}
   \begin{itemize}
