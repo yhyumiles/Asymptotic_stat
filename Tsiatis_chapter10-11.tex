@@ -42,12 +42,12 @@
 
 \begin{frame}{Today's agenda}
   \begin{itemize}
-    \item Recap: Coarsened data, IF geometry, AIPWCC in one slide
+    \item Recap: Notation, Coarsened data, IF geometry, AIPWCC
     \item Chapter 10: Two-level missingness $\Rightarrow$ efficient AIPWCC \& DR
     \item \emph{Skip (brief mention only):} monotone coarsening details, censoring
     \item Generalization idea (operators $L,\,M,\,M^{-1}$) for later use
-    \item Chapter 11: Locally efficient estimators (two representations; how to compute)
-    \item Practical recipe: what to implement in 2h
+    \item Chapter 11: (two representations; how to compute)
+    \item Implementation scehme
   \end{itemize}
 \end{frame}
 
@@ -203,11 +203,11 @@
   \begin{itemize}
     \item Consider the case where we can \alert{choose} an estimating function $m(Z,\beta)$.
     \item \textbf{Optimal} augmentation: $h_2^\star(Z_1,\beta)=\E\!\left[m(Z,\beta)\mid Z_1\right]$.
-    \item In practice, posit a (possibly misspecified) model $p^\ast_{Z_2|Z_1}(\cdot\mid z_1;\xi)$ and compute
+    \item So, we posit a (possibly misspecified) model $p^\ast_{Z_2|Z_1}(\cdot\mid z_1;\xi)$ and compute CEF
     \[
       h_2^\ast(Z_1,\beta,\xi)=\int m(z_1,u,\beta)\,p^\ast_{Z_2|Z_1}(u\mid z_1;\xi)\,du.
     \]
-    \item Estimation: fit $\hat\psi$ by MLE for $\pi(\cdot,\psi)$; fit $\hat\xi^\ast$ by likelihood for the posited model; solve
+    \item Estimation: fit $\hat\psi_n$ by MLE for $\pi(\cdot,\psi)$; fit $\hat\xi^\ast_n$ by likelihood for the posited model; solve
     \[
       \sum_{i=1}^n\left[\frac{R_i}{\pi(Z_{1i},\hat\psi_n)}m(Z_i,\beta)
       -\frac{R_i-\pi(Z_{1i},\hat\psi_n)}{\pi(Z_{1i},\hat\psi_n)}\,h_2^\ast(Z_{1i},\beta,\hat\xi_n^\ast)\right]=0.
@@ -254,7 +254,7 @@
     Hence, the adaptive estimator is asymptotically equivalent to the
     AIPWCC estimator.
   \end{tcolorbox}
-  \item Thus, we think misspecification of $\xi$ and its estimation (=adaptive estimation) as a kind of negliguble problem. (BUT no efficiency !)
+  \item Thus, we think misspecification of $\xi$ and its estimation (=adaptive estimation) as a kind of negligible problem. (BUT no efficiency !)
   \end{itemize}
 \end{frame}
 
@@ -264,37 +264,22 @@
     \[
       \textit{either}\ \ \pi(Z_1,\psi)\ \text{is correctly specified} \quad \textbf{or}\quad p^\ast_{Z_2|Z_1}(\cdot\mid Z_1;\xi)\ \text{is correct}.
     \]
-    \item Proof sketch for monotone coarsening: algebraic identity + CAR $\Rightarrow$ decompositions where either model kills the bias term.
-  \end{itemize}
-  \begin{tcolorbox}[title=Takeaway]
-  Adaptive augmentation buys efficiency; the DR structure buys protection against one misspecification.
-  \end{tcolorbox}
-  % DR statement and identity underpinning (10.62)–(10.65) and Theorem 10.5
-  % :contentReference[oaicite:19]{index=19}  :contentReference[oaicite:20]{index=20}
-\end{frame}
-
-\begin{frame}{Worked example (logistic regression; design-based missingness)}
-  \begin{itemize}
-    \item Full-data $m(Z,\beta)$ chosen for logistic model of $Y$ on $X=(X_1,X_2)$.
-    \item Under two-level missingness, the AIPWCC form becomes (schematically)
+    \item The estimation function holds, then $\beta$ is consistent and asymptotically normal.
     \[
-      \sum_i\left[\frac{R_i}{\pi(Y_i,X_{1i};\hat\psi)}\,X^\ast_i\{Y_i-\mu_\beta(X_i)\}
-      -\frac{R_i-\pi(Y_i,X_{1i};\hat\psi)}{\pi(Y_i,X_{1i};\hat\psi)}\,L(Y_i,X_{1i})\right]=0,
-    \]
-    with $L^\star(Y,X_1)=\E\!\left[X^\ast\{Y-\mu_\beta(X)\}\mid Y,X_1\right]$.
-  \end{itemize}
-  % Logistic revisited, (10.38)–(10.39); L* as conditional mean given (Y,X1)
-  % :contentReference[oaicite:21]{index=21}
-\end{frame}
+\E\!\left[
+  \frac{R\,m(Z,\beta_{0})}{\pi(Z_{1},\psi^{\ast})}
+  - \left\{
+      \frac{R-\pi(Z_{1},\psi^{\ast})}{\pi(Z_{1},\psi^{\ast})}
+    \right\}
+    h^{\ast}_{2}(Z_{1},\beta_{0},\xi^{\ast})
+\right] = 0,
+\]
+\[
+\text{where } \hat{\psi}_{n}\xrightarrow{P}\psi^{\ast}
+\quad \text{and} \quad \hat{\xi}^{\ast}_{n}\xrightarrow{P}\xi^{\ast}.
+\]
 
-\begin{frame}{What we skip in Ch.~10 (for time)}
-  \begin{itemize}
-    \item Detailed development for \emph{monotone coarsening} and for \emph{censoring} (survival)---we’ll pick up the tools where needed in Ch.~11.
-    \item Nonmonotone coarsening exists but is computationally heavy (iterative projections, integral operators).
   \end{itemize}
-  \begin{tcolorbox}[title=Pointer]
-    Keep the operators $L$ and $M$ in mind; they will be our bridge to Chapter~11.
-  \end{tcolorbox}
 \end{frame}
 
 \section{10.5 Improving Efficiency when Coarsening is Nonmonotone}
@@ -316,7 +301,7 @@
     \]
     and 
     \[
-        M\{h_F(\cdot)\} = \sum_{r=1}^{\infty} \#\{r,G_r(Z)\}\,\E\{h_F(Z)\mid G_r(Z)\}.
+        M\{h_F(\cdot)\} = \sum_{r=1}^{\infty} \pi\{r,G_r(Z)\}\,\E\{h_F(Z)\mid G_r(Z)\}.
     \]
 \end{frame}
 
